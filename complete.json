@@ -1,0 +1,21 @@
+{
+    "type": "template",
+    "altText": "this is a confirm template",
+    "template": {
+        "type": "buttons",
+        "text": "輸入以下資訊已確保功能完整\n按n可以再次開啟選單",
+        "actions": [{
+            "type": "postback",
+            "label": "name",
+            "data": "name"
+        }, {
+            "type": "postback",
+            "label": "phone",
+            "data": "phone"
+        }, {
+            "type": "postback",
+            "label": "relatePhone",
+            "data": "relatePhone"
+        }]
+    }
+}
