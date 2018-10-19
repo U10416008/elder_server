@@ -1,0 +1,13 @@
+{
+    "type": "template",
+    "altText": "this is a confirm template",
+    "template": {
+        "type": "buttons",
+        "text": "輸入行事曆\n格式( 'HH:MM:what to do' )\n輸入s可以再次開啟選單",
+        "actions": [{
+            "type": "postback",
+            "label": "schedule",
+            "data": "schedule"
+        }]
+    }
+}
