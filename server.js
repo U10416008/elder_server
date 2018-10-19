@@ -14,13 +14,12 @@ var svr = net.createServer(function(sock) {
             if (sockets[i] != sock && sockets[i] != server_sockets) {
                 if (sockets[i]) {
                     sockets[i].write(data);
-
                 }
             }
         }
         if (data.toString('utf8') === 'Line_Server') {
             server_sockets = sock;
-        } else if (server_sockets !== null && data.toString('utf8').length === 10) {
+        } else if (server_sockets !== null && data.toString('utf8').split("&")[0].length === 10) {
             server_sockets.write(data);
         }
         console.log('Server:' + data.toString('utf8'));

@@ -6,23 +6,27 @@ var net = require('net');
 var server2 = require("./server");
 const config = require('./config.json');
 var info = require("./server_info.json");
-var async = require('async');
 let bot = linebot(config);
 var dbtype = '';
-var userId = "U548933d75e6e60d618c6818d70745421";
+var userId = "Ufeb02e42c5d950418ba94d645b5c1245";
 var myLineRelate = require('./complete.json');
 var con = net.createConnection(info.port, info.host, function() {
     con.write('Line_Server');
-
 })
-
+var date = new Date();
+// get number
 con.on('data', function(data) {
-    console.log(data.toString('utf8'));
-    if (data.toString('utf8').length === 10) {
-        db.exist(data.toString('utf8'), push)
+    var regtest = /((\+[0-9]{1}[0-9]{10})|([0-9]{10}))/g;
+    var regexp = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g;
+    var number = (data.toString('utf8')).match(regtest);
+    if (number != null) {
+        console.log(number[0]);
+        console.log(number[1].replace(/\+/, ''));
     }
 
-
+    if (number != null && number.length >= 2) {
+        db.exist(number[1].replace(/\+/, ''), number[0].replace(/\+/, ''), push)
+    }
 });
 
 function push(data) {
@@ -42,10 +46,13 @@ bot.on('message', function(event) {
         var replyMsg = '';
         if (msg === 'n' || msg === 'N') {
             dbtype = '';
-            db.insert(userId, msg, dbtype);
+            date = new Date();
+            db.insert(userId, msg, dbtype, date.getTime());
             replyMsg = myLineRelate;
         } else if (dbtype === 'phone' || dbtype === 'name' || dbtype === 'relatePhone') {
-            db.insert(userId, msg, dbtype);
+            //insert info ,needs date
+
+            db.insert(userId, msg, dbtype, date.getTime());
             dbtype = '';
             replyMsg = 'OK';
         } else {
@@ -61,7 +68,7 @@ bot.on('message', function(event) {
     }
 });
 bot.on('postback', function(event) {
-
+    console.log(event);
     var myResult = getString(event.postback.data);
     if (myResult !== '') {
         event.reply(myResult).then(function(data) {
@@ -85,8 +92,14 @@ function getString(data) {
     return 'no this type';
 
 }
+setInterval(function() {
+    date = new Date();
+    console.log("Now Time" + date.getTime());
+    db.getLastDate(date, push);
+
+}, 10000);
 setTimeout(function() {
-    var userId = 'U548933d75e6e60d618c6818d70745421';
+    var userId = 'Ufeb02e42c5d950418ba94d645b5c1245';
     var sendMsg = "push msg to one user";
     bot.push(userId, [sendMsg]);
     console.log('userId: ' + userId);

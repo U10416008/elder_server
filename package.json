@@ -1,18 +1,26 @@
 {
-  "name": "elder_server",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "async": "^2.6.0",
-    "linebot": "^1.4.1",
-    "socket.io": "^2.0.4"
-  },
-  "devDependencies": {},
-  "description": ""
+    "name": "elder_server",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node index.js"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "async": "^2.6.0",
+        "linebot": "^1.4.1",
+        "socket.io": "^2.0.4"
+    },
+    "devDependencies": {},
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/U10416008/elder_server.git"
+    },
+    "bugs": {
+        "url": "https://github.com/U10416008/elder_server/issues"
+    },
+    "homepage": "https://github.com/U10416008/elder_server#readme",
+    "description": ""
 }
