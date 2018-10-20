@@ -3,7 +3,8 @@ var db = require('./db');
 var info = require('./server_info.json');
 var sockets = [];
 var server_sockets;
-var svr = net.createServer(function(sock) {
+var svr = net.createServer();
+svr.on('connection', function(sock) {
     console.log('Connected: ' + sock.remoteAddress + ':' + sock.remotePort);
     sockets.push(sock);
 
@@ -28,7 +29,8 @@ var svr = net.createServer(function(sock) {
             } else if (data.split('&')[0] === 'location') {
                 server_sockets.write(data);
             } else if (data.includes('schedule')) {
-                console.log(data.split('&')[1].replace('+', ''));
+                //console.log(sock);
+                //sock.write('hello');
                 db.get_schedule(data.split('&')[1].replace('+', ''), sock);
 
 
@@ -46,6 +48,7 @@ var svr = net.createServer(function(sock) {
             delete sockets[idx];
         }
     });
+
 
 });
 var svrport = info.port;

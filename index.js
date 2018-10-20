@@ -16,11 +16,12 @@ var con = net.createConnection(info.port, info.host, function() {
 
 });
 var regtest = /((\+[0-9]{1}[0-9]{10})|([0-9]{10}))/g;
-var regSchedule = /([0-1]?[0-9]:[0-5]?[0-9]:[a-z]*)/g;
+var regSchedule = /([0,1]?[0-9]:)?([0-3]?[0-9]:)?([0-1]?[0-9]:[0-5]?[0-9]:[a-z]*)/g;
 var date = new Date();
 
 // get number
 con.on('data', function(data) {
+    console.log('Receive:' + data.toString('utf8'));
     var loc = data.toString('utf8').split('&');
     if (loc[0] === 'location') {
         loc[1] = loc[1].replace(/\+/, '');
@@ -90,7 +91,7 @@ bot.on('message', function(event) {
                 db.insert_schedule(userId, msg);
 
             } else {
-                replyMsg = '行事曆\n格式(\'HH:MM:what to do\')';
+                replyMsg = '行事曆\n格式(\'MM:DD:HH:MM:what to do\')';
             }
         } else {
             replyMsg = msg;

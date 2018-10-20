@@ -58,9 +58,22 @@ function insert_schedule(userId, msg) {
         dbo = db.db('user');
         dbCol = dbo.collection('userTable');
         dbCol_schedule = dbo.collection('userSchedule');
-        console.log('Connected!');
-        msg = msg.split(':');
-        var myobj = { 'relatePhone': '', 'schedule': msg[2], 'hour': msg[0], 'minute': msg[1] };
+        //console.log('Connected!');
+        msg = msg.split(':').reverse();
+
+        var myobj = { 'relatePhone': '', 'schedule': msg[0], 'milli': '' };
+        var date = new Date();
+        //console.log(date.getDate());
+        var day = (msg.length > 3) ? msg[3] :
+            ((Number)(msg[2]) <= date.getHours()) ? (date.getDate() + 1) : (date.getDate());
+        var month = (msg.length > 4) ? msg[4] :
+            ((Number)(msg[3]) <= date.getDate()) ? (date.getMonth() + 2) : (date.getMonth() + 1);
+        var year = month <= date.getMonth() ? (date.getFullYear() + 1) : (date.getFullYear());
+        var sDate = year + '-' + month + '-' + day + ' ' + msg[2] + ':' + msg[1] + ':00';
+        console.log(sDate);
+        var time = new Date(sDate).getTime();
+        console.log(time);
+        myobj.milli = time.toString();
         dbCol.find({ 'userId': userId }).toArray(function(err, result) {
             if (err) throw err;
             if (result.length > 0) {
@@ -68,13 +81,13 @@ function insert_schedule(userId, msg) {
                 dbCol_schedule.insertOne(myobj, function(err, res) {
                     if (err) throw err;
 
-                    console.log(res);
+                    //console.log(res);
                     db.close();
                 });
             } else {
                 db.close();
             }
-            console.log(result);
+            //console.log(result);
         });
     });
 
@@ -87,17 +100,23 @@ function get_schedule(relatePhone, sock) {
         if (err) throw err;
         this.db = db;
         dbo = db.db('user');
-        dbCol = dbo.collection('userTable');
+        //dbCol = dbo.collection('userTable');
         dbCol_schedule = dbo.collection('userSchedule');
         console.log('Connected!');
         dbCol_schedule.find({ 'relatePhone': relatePhone }).toArray(function(err, result) {
             if (err) throw err;
             //console.log(result);
             if (result.length > 0) {
-
-                var data = result[0].hour + ':' + result[0].minute + ':' + result[0].schedule;
+                var data = '';
+                for (var i = 0; i < result.length; i++) {
+                    var data_current = result[i].milli + ':' + result[i].schedule + '&';
+                    data += data_current;
+                }
                 console.log(data.toString());
-                sock.write(data.toString());
+
+                sock.write(data.toString() + '\n');
+
+
             }
 
             db.close();
