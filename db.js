@@ -50,7 +50,7 @@ function insert(userId, msg, dbtype, date) {
 
     });
 }
-
+//insert data to db
 function insert_schedule(userId, msg) {
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
@@ -68,7 +68,8 @@ function insert_schedule(userId, msg) {
             ((Number)(msg[2]) <= date.getHours()) ? (date.getDate() + 1) : (date.getDate());
         var month = (msg.length > 4) ? msg[4] :
             ((Number)(msg[3]) <= date.getDate()) ? (date.getMonth() + 2) : (date.getMonth() + 1);
-        var year = month <= date.getMonth() ? (date.getFullYear() + 1) : (date.getFullYear());
+        var year = month < date.getMonth() ? (date.getFullYear() + 1) :
+            (month == date.getMonth() && day <= date.getDate()) ? date.getFullYear() + 1 : date.getFullYear();
         var sDate = year + '-' + month + '-' + day + ' ' + msg[2] + ':' + msg[1] + ':00';
         console.log(sDate);
         var time = new Date(sDate).getTime();
@@ -93,20 +94,38 @@ function insert_schedule(userId, msg) {
 
 
 }
-
-function get_schedule(relatePhone, sock) {
-    console.log('DB :' + relatePhone);
+//delete data in db
+function drop_outdate(now) {
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         this.db = db;
         dbo = db.db('user');
         //dbCol = dbo.collection('userTable');
         dbCol_schedule = dbo.collection('userSchedule');
-        console.log('Connected!');
-        dbCol_schedule.find({ 'relatePhone': relatePhone }).toArray(function(err, result) {
+        dbCol_schedule.deleteMany({ 'milli': { $lte: now.toString(), $gt: '0' } }, function(err, result) {
+            if (err) throw err;
+            db.close();
+        });
+    });
+}
+
+function get_schedule(relatePhone, sock) {
+    console.log('DB :' + relatePhone);
+    var time = new Date().getTime();
+    var add_24h = time + 86400000;
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        this.db = db;
+        dbo = db.db('user');
+        //dbCol = dbo.collection('userTable');
+        dbCol_schedule = dbo.collection('userSchedule');
+        console.log(time);
+
+        dbCol_schedule.find({ 'relatePhone': relatePhone, 'milli': { $lte: add_24h.toString(), $gt: time.toString() } }).toArray(function(err, result) {
             if (err) throw err;
             //console.log(result);
             if (result.length > 0) {
+                sort(result);
                 var data = '';
                 for (var i = 0; i < result.length; i++) {
                     var data_current = result[i].milli + ':' + result[i].schedule + '&';
@@ -126,6 +145,12 @@ function get_schedule(relatePhone, sock) {
     });
 }
 
+function sort(result) {
+    result.sort(function(a, b) {
+        return a.milli - b.milli;
+    });
+}
+//get the last time of receiving the number from younger
 function getLastDate(nowDate, push) {
     var minLastDate = nowDate - 36000000;
     MongoClient.connect(url, function(err, db) {
@@ -152,7 +177,7 @@ function getLastDate(nowDate, push) {
     });
 
 }
-
+//check the user is in db or not
 function exist(relateNumber, remindNumber, push) {
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
@@ -188,7 +213,6 @@ function exist(relateNumber, remindNumber, push) {
             }
         });
     });
-
 }
 
 function exist_loc(relateNumber, push) {
@@ -222,3 +246,4 @@ exports.exist = exist;
 exports.exist_loc = exist_loc;
 exports.insert_schedule = insert_schedule;
 exports.get_schedule = get_schedule;
+exports.drop_outdate = drop_outdate;

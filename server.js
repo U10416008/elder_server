@@ -8,21 +8,23 @@ svr.on('connection', function(sock) {
     console.log('Connected: ' + sock.remoteAddress + ':' + sock.remotePort);
     sockets.push(sock);
 
-
-
     sock.on('data', function(data) {
         for (var i = 0; i < sockets.length; i++) {
+
             if (sockets[i] != sock && sockets[i] != server_sockets) {
                 if (sockets[i]) {
                     sockets[i].write(data);
                 }
             }
         }
+        //connect to Line 
         if (data.toString('utf8') === 'Line_Server') {
+            //save this socket ,this is the message from Line 
             server_sockets = sock;
             sock.write('Welcome to the server!\n');
 
         } else if (server_sockets !== null) {
+            //other client message
             data = data.toString('utf8');
             if (data.split('&')[0].length === 10) {
                 server_sockets.write(data);
@@ -32,8 +34,6 @@ svr.on('connection', function(sock) {
                 //console.log(sock);
                 //sock.write('hello');
                 db.get_schedule(data.split('&')[1].replace('+', ''), sock);
-
-
             }
 
         }

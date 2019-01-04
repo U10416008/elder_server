@@ -11,6 +11,8 @@ var dbtype = '';
 var userId = 'Ufeb02e42c5d950418ba94d645b5c1245';
 var myLineRelate = require('./complete.json');
 var myLineSchedule = require('./schedule.json');
+
+//create connection with server
 var con = net.createConnection(info.port, info.host, function() {
     con.write('Line_Server');
 
@@ -52,6 +54,7 @@ function push(data, text) {
         bot.push(mind_userId, push_msg);
     }
 }
+//receive message from Line 
 bot.on('message', function(event) {
     // 把收到訊息的 event 印出來
     console.log(event);
@@ -134,7 +137,9 @@ function getString(data) {
 }
 setInterval(function() {
     date = new Date();
+
     console.log('Now Time' + date.getTime());
+    db.drop_outdate(date.getTime());
     db.getLastDate(date, push);
 
 }, 180000);
